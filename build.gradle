@@ -1,0 +1,25 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://react-native-community.github.io/maven-releases' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.0.0' // Match this with Gradle version in wrapper
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://react-native-community.github.io/maven-releases' }
+        maven { url 'https://react-native-firebase.jfrog.io/react-native-firebase/releases' } // For Firebase (if used)
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
