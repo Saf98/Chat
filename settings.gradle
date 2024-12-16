@@ -1,5 +1,0 @@
-rootProject.name = 'chat'
-include ':react-native'
-include ':app'
-
-project(':react-native').projectDir = new File(rootDir, './node_modules/react-native/android')
