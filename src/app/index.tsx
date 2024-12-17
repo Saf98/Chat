@@ -13,23 +13,20 @@ const index = () => {
 	}
 
 	if (!session) {
-		console.log("not logged in", session);
-		return <Redirect href={"/sign-in"} />;
+		return <Redirect href={"/(auth)/sign-in"} />;
 	}
 
-	// if (!isAdmin) {
-	// 	<Redirect href={"/(user)"} />
-	// 	return;
-	// }
-
-	// if (session.user) {
-	// 	console.log("logged in", session.user);
-	// }
+	if (!isAdmin) {
+		<Redirect href={"/(user)"} />;
+	}
 
 	return (
 		<View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
-			<Button text="User" />
-			<Button text="Admin" />
+			<Link href={"/(user)"} asChild>
+				<Button text="User" />
+			</Link>
+
+			{/* <Button text="Admin" /> */}
 			<Button onPress={() => supabase.auth.signOut()} text="Sign out" />
 		</View>
 	);

@@ -13,10 +13,9 @@ const SignInScreen = () => {
 
 	const { session } = useAuth();
 
-	if (session) {
-		console.log("logged in", session.user);
-		return <Redirect href={"/"} />;
-	}
+	// if (session) {
+	// 	return <Redirect href={"/(user)/contacts"} />;
+	// }
 
 	async function signInWithEmail() {
 		setLoading(true);
@@ -34,6 +33,7 @@ const SignInScreen = () => {
 			<Stack.Screen options={{ title: "Sign in" }} />
 
 			<Text style={styles.label}>Email</Text>
+
 			<TextInput
 				value={email}
 				onChangeText={setEmail}

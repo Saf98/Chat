@@ -6,6 +6,7 @@ import { Link, Stack } from "expo-router";
 import { supabase } from "src/lib/supabase";
 
 const SignUpScreen = () => {
+	// const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -21,7 +22,13 @@ const SignUpScreen = () => {
 	return (
 		<View style={styles.container}>
 			<Stack.Screen options={{ title: "Sign up" }} />
-
+			{/* <Text style={styles.label}>Username</Text>
+			<TextInput
+				value={username}
+				onChangeText={setUsername}
+				placeholder="Jon Doe"
+				style={styles.input}
+			/> */}
 			<Text style={styles.label}>Email</Text>
 			<TextInput
 				value={email}
