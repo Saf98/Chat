@@ -4,9 +4,8 @@ import Button from "@components/Button";
 import Colors from "@constants/Colors";
 import { Link, Stack } from "expo-router";
 import { supabase } from "src/lib/supabase";
-
+import Avatar from "@/components/Avatar";
 const SignUpScreen = () => {
-	// const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -22,13 +21,7 @@ const SignUpScreen = () => {
 	return (
 		<View style={styles.container}>
 			<Stack.Screen options={{ title: "Sign up" }} />
-			{/* <Text style={styles.label}>Username</Text>
-			<TextInput
-				value={username}
-				onChangeText={setUsername}
-				placeholder="Jon Doe"
-				style={styles.input}
-			/> */}
+			<Avatar />
 			<Text style={styles.label}>Email</Text>
 			<TextInput
 				value={email}
@@ -51,9 +44,12 @@ const SignUpScreen = () => {
 				disabled={loading}
 				text={loading ? "Creating account..." : "Create account"}
 			/>
-			<Link href="/sign-in" style={styles.textButton}>
-				Sign in
-			</Link>
+			<Text>
+				Already have an account? &nbsp;
+				<Link href="/sign-in" style={styles.textButton}>
+					Sign in
+				</Link>
+			</Text>
 		</View>
 	);
 };
