@@ -4,13 +4,18 @@ import Button from "@components/Button";
 import Colors from "@constants/Colors";
 import { Link, Stack } from "expo-router";
 import { supabase } from "src/lib/supabase";
+import Avatar from "@/components/Avatar";
+import { useForm } from "react-hook-form";
+import CustomInput from "@/components/CustomInput";
+import { EMAIL_REGEX } from "@/constants/Utils";
 
 const SignUpScreen = () => {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
+	const { control, handleSubmit, watch } = useForm();
 
-	async function signUpWithEmail() {
+	const passwordCheck = watch("password");
+
+	async function signUpWithEmail({ email, password }: any) {
 		setLoading(true);
 		const { error } = await supabase.auth.signUp({ email, password });
 
@@ -20,33 +25,54 @@ const SignUpScreen = () => {
 
 	return (
 		<View style={styles.container}>
-			<Stack.Screen options={{ title: "Sign up" }} />
-
-			<Text style={styles.label}>Email</Text>
-			<TextInput
-				value={email}
-				onChangeText={setEmail}
-				placeholder="jon@gmail.com"
-				style={styles.input}
+			<CustomInput
+				control={control}
+				name={"email"}
+				placeholder={"email@user.com"}
+				secureTextEntry={false}
+				rules={{
+					required: "Email is required",
+					pattern: { value: EMAIL_REGEX, message: "Email is invalid" },
+					minLength: { value: 6, message: "Minimum of 6 characters required" },
+					maxLength: {
+						value: 24,
+						message: "Minimum of 24 characters required",
+					},
+				}}
 			/>
-
-			<Text style={styles.label}>Password</Text>
-			<TextInput
-				value={password}
-				onChangeText={setPassword}
-				placeholder=""
-				style={styles.input}
-				secureTextEntry
+			<CustomInput
+				control={control}
+				name={"password"}
+				placeholder={"password"}
+				secureTextEntry={true}
+				rules={{
+					required: "Password is required",
+					minLength: { value: 6, message: "Minimum of 6 characters required" },
+				}}
+			/>
+			<CustomInput
+				control={control}
+				name={"password-repeat"}
+				placeholder={"Repeat password"}
+				secureTextEntry={true}
+				rules={{
+					required: "Password is required",
+					validate: (value): true | "Password does not match" =>
+						value === passwordCheck || "Password does not match",
+				}}
 			/>
 
 			<Button
-				onPress={signUpWithEmail}
+				onPress={handleSubmit(signUpWithEmail)}
 				disabled={loading}
 				text={loading ? "Creating account..." : "Create account"}
 			/>
-			<Link href="/sign-in" style={styles.textButton}>
-				Sign in
-			</Link>
+			<Text>
+				Already have an account? &nbsp;
+				<Link href="/sign-in" style={styles.textButton}>
+					Sign in
+				</Link>
+			</Text>
 		</View>
 	);
 };
@@ -56,18 +82,6 @@ const styles = StyleSheet.create({
 		padding: 20,
 		justifyContent: "center",
 		flex: 1,
-	},
-	label: {
-		color: "gray",
-	},
-	input: {
-		borderWidth: 1,
-		borderColor: "gray",
-		padding: 10,
-		marginTop: 5,
-		marginBottom: 20,
-		backgroundColor: "white",
-		borderRadius: 5,
 	},
 	textButton: {
 		alignSelf: "center",

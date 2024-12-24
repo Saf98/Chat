@@ -11,7 +11,8 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "react-native";
-import AuthProvider from "src/providers/AuthProvider";
+import AuthProvider from "@/providers/AuthProvider";
+import QueryProvider from "@/providers/QueryProvider";
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -56,9 +57,9 @@ function RootLayoutNav() {
 	return (
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
 			<AuthProvider>
-				<Stack>
-					<Stack.Screen name="(auth)" options={{ headerShown: true }} />
-				</Stack>
+				<QueryProvider>
+					<Stack />
+				</QueryProvider>
 			</AuthProvider>
 		</ThemeProvider>
 	);
