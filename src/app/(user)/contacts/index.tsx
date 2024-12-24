@@ -1,4 +1,5 @@
 import { useProfiles } from "@/api/users/user";
+import Avatar from "@/components/Avatar";
 import { View, Text } from "@/components/Themed";
 import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet } from "react-native";
@@ -13,7 +14,35 @@ const ContactsScreen = () => {
 				renderItem={({ item }) => (
 					<Link href={`/contacts/${item.id}`} asChild>
 						<Pressable>
-							<Text style={styles.item}>{item.username}</Text>
+							<View style={styles.contact}>
+								<Avatar
+									frameSize={49}
+									avatarSize={38}
+									marginLeft={5}
+									marginBottom={3}
+									radius={2}
+								/>
+								<View style={styles.content}>
+									<Text
+										style={{
+											fontWeight: "500",
+											fontSize: 18,
+											color: "rgb(17 71 164)",
+										}}
+									>
+										{item.username}
+									</Text>
+									<Text
+										style={{
+											fontSize: 12,
+											fontStyle: "italic",
+											color: "rgb(17 71 164)",
+										}}
+									>
+										{item.status || "Update my status..."}
+									</Text>
+								</View>
+							</View>
 						</Pressable>
 					</Link>
 				)}
@@ -29,9 +58,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingTop: 22,
 	},
-	item: {
+	contact: {
+		flex: 1,
+		flexDirection: "row",
+		flexWrap: "wrap",
 		padding: 10,
-		fontSize: 18,
-		height: 44,
+		alignItems: "center",
+	},
+	content: {
+		padding: 10,
 	},
 });

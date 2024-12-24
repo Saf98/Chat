@@ -58,9 +58,7 @@ function RootLayoutNav() {
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
 			<AuthProvider>
 				<QueryProvider>
-					<Stack>
-						<Stack.Screen name="(auth)" options={{ headerShown: true }} />
-					</Stack>
+					<Stack />
 				</QueryProvider>
 			</AuthProvider>
 		</ThemeProvider>

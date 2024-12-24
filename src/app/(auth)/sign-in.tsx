@@ -32,7 +32,6 @@ const SignInScreen = () => {
 
 	return (
 		<View style={styles.container}>
-			<Stack.Screen options={{ title: "Sign in" }} />
 			<CustomInput
 				control={control}
 				name={"email"}

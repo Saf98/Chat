@@ -19,7 +19,7 @@ const Button = forwardRef<View | null, ButtonProps>(
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: Colors.dark.background,
-		padding: 15,
+		padding: 6,
 		alignItems: "center",
 		borderRadius: 15,
 		marginVertical: 10,

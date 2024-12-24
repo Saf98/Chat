@@ -25,7 +25,6 @@ const SignUpScreen = () => {
 
 	return (
 		<View style={styles.container}>
-			<Stack.Screen options={{ title: "Sign up" }} />
 			<CustomInput
 				control={control}
 				name={"email"}
