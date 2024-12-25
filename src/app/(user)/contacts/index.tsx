@@ -1,6 +1,7 @@
 import { useProfiles } from "@/api/users/user";
 import Avatar from "@/components/Avatar";
 import { View, Text } from "@/components/Themed";
+import UserHeader from "@/components/UserHeader";
 import { Link } from "expo-router";
 import { FlatList, Pressable, StyleSheet } from "react-native";
 
@@ -9,6 +10,7 @@ const ContactsScreen = () => {
 
 	return (
 		<View>
+			<UserHeader />
 			<FlatList
 				data={profiles}
 				renderItem={({ item }) => (

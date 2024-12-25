@@ -102,9 +102,43 @@ export default function MessageScreen() {
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => {
 						return item.sender_id === userProfile.id ? (
-							<Text style={{ textAlign: "right" }}>{item.message}</Text>
+							<View
+								style={{
+									backgroundColor: "#8ea9d9",
+									marginTop: 10,
+									padding: 10,
+									borderRadius: 15,
+									alignSelf: "flex-end",
+									borderTopRightRadius: 0,
+								}}
+							>
+								<Text
+									style={{
+										color: "#ffffff",
+									}}
+								>
+									{item.message}
+								</Text>
+							</View>
 						) : (
-							<Text style={{ textAlign: "left" }}>{item.message}</Text>
+							<View
+								style={{
+									backgroundColor: "#ffffff",
+									marginTop: 10,
+									padding: 10,
+									borderRadius: 15,
+									borderTopLeftRadius: 0,
+									alignSelf: "flex-start",
+								}}
+							>
+								<Text
+									style={{
+										color: "#7b99cd",
+									}}
+								>
+									{item.message}
+								</Text>
+							</View>
 						);
 					}}
 				/>
