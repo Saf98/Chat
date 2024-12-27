@@ -76,7 +76,25 @@ export async function updateUsername(updates: { username?: string }) {
 
 	if (error) throw new Error(error.message);
 
-	console.log("Profile updated successfully");
+	console.log("Username updated successfully");
+}
+
+export async function updateStatus(updates: { status?: string }) {
+	const {
+		data: { user },
+		error: authError,
+	} = await supabase.auth.getUser();
+
+	if (authError || !user) throw new Error("User not logged in");
+
+	const { error } = await supabase
+		.from("profiles")
+		.update(updates)
+		.eq("id", user.id);
+
+	if (error) throw new Error(error.message);
+
+	console.log("Status updated successfully");
 }
 
 export function useInsertMessage() {

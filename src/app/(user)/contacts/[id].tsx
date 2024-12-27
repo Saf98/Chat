@@ -16,6 +16,7 @@ import {
 	StyleSheet,
 	ActivityIndicator,
 	FlatList,
+	SafeAreaView,
 } from "react-native";
 
 export default function MessageScreen() {
@@ -30,7 +31,6 @@ export default function MessageScreen() {
 		receiverId as string
 	);
 	const ref = useRef<FlatList>(null);
-	// let listViewRef;
 
 	const queryClient = useQueryClient();
 
@@ -100,58 +100,60 @@ export default function MessageScreen() {
 	};
 
 	return (
-		<View style={styles.container}>
-			<Text>Messaging {profile?.username}</Text>
+		<SafeAreaView style={styles.container}>
 			{isLoading && <ActivityIndicator />}
 			{messages && (
-				<FlatList
-					keyboardShouldPersistTaps="handled"
-					inverted={false}
-					onContentSizeChange={scrollToBottom}
-					data={messages}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => {
-						return item.sender_id === userProfile.id ? (
-							<View
-								style={{
-									backgroundColor: "#8ea9d9",
-									marginTop: 10,
-									padding: 10,
-									borderRadius: 15,
-									alignSelf: "flex-end",
-									borderTopRightRadius: 0,
-								}}
-							>
-								<Text
+				<View style={styles.wrapper}>
+					<FlatList
+						ref={ref}
+						keyboardShouldPersistTaps="handled"
+						inverted={false}
+						onContentSizeChange={scrollToBottom}
+						data={messages}
+						keyExtractor={(item) => item.id}
+						renderItem={({ item }) => {
+							return item.sender_id === userProfile.id ? (
+								<View
 									style={{
-										color: "#ffffff",
+										backgroundColor: "#8ea9d9",
+										marginTop: 10,
+										padding: 10,
+										borderRadius: 15,
+										alignSelf: "flex-end",
+										borderTopRightRadius: 0,
 									}}
 								>
-									{item.message}
-								</Text>
-							</View>
-						) : (
-							<View
-								style={{
-									backgroundColor: "#ffffff",
-									marginTop: 10,
-									padding: 10,
-									borderRadius: 15,
-									borderTopLeftRadius: 0,
-									alignSelf: "flex-start",
-								}}
-							>
-								<Text
+									<Text
+										style={{
+											color: "#ffffff",
+										}}
+									>
+										{item.message}
+									</Text>
+								</View>
+							) : (
+								<View
 									style={{
-										color: "#7b99cd",
+										backgroundColor: "#ffffff",
+										marginTop: 10,
+										padding: 10,
+										borderRadius: 15,
+										borderTopLeftRadius: 0,
+										alignSelf: "flex-start",
 									}}
 								>
-									{item.message}
-								</Text>
-							</View>
-						);
-					}}
-				/>
+									<Text
+										style={{
+											color: "#7b99cd",
+										}}
+									>
+										{item.message}
+									</Text>
+								</View>
+							);
+						}}
+					/>
+				</View>
 			)}
 			<TextInput
 				placeholder="Type your message..."
@@ -160,18 +162,23 @@ export default function MessageScreen() {
 				editable={!isLoading} // Disable input while sending
 			/>
 			<Button title="Send" onPress={handleSendMessage} disabled={isLoading} />
-		</View>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingTop: 22,
+		paddingTop: 0,
+	},
+	wrapper: {
+		flex: 1,
+		backgroundColor: "none",
 	},
 	item: {
 		padding: 10,
 		fontSize: 18,
 		height: 44,
+		marginBottom: 70,
 	},
 });

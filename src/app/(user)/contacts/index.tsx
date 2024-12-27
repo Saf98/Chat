@@ -1,8 +1,4 @@
-import {
-	updateUsername,
-	useLoggedInUserProfile,
-	useProfiles,
-} from "@/api/users/user";
+import { useLoggedInUserProfile, useProfiles } from "@/api/users/user";
 import Avatar from "@/components/Avatar";
 import { View, Text } from "@/components/Themed";
 import { Link } from "expo-router";
@@ -10,11 +6,12 @@ import { FlatList, Pressable, StyleSheet } from "react-native";
 
 const ContactsScreen = () => {
 	const { data: profiles } = useProfiles();
-
+	const { data: profile, isLoading, error } = useLoggedInUserProfile();
+	const filteredProfiles = profiles?.filter((el) => el.id !== profile.id);
 	return (
 		<View>
 			<FlatList
-				data={profiles}
+				data={filteredProfiles}
 				renderItem={({ item }) => (
 					<Link href={`/contacts/${item.id}`} asChild>
 						<Pressable>
