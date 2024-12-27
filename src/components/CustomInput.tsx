@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet, Text } from "react-native";
+import { View, TextInput, StyleSheet, Text, Platform } from "react-native";
 import {
 	Control,
 	Controller,
@@ -90,13 +90,14 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		borderColor: "#f6f8fc",
 		maxWidth: "auto",
-		padding: 6,
+		padding: Platform.OS === "ios" ? 20 : 6,
 	},
 	input: {
 		flex: 1,
 		backgroundColor: "#f6f8fc",
 		color: "#424242",
 		fontSize: 18,
+		marginLeft: Platform.OS === "ios" ? 5 : null,
 	},
 	borderTrue: {
 		borderColor: "rgb(17 71 164)",

@@ -1,12 +1,55 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+	View,
+	Text,
+	StyleSheet,
+	Pressable,
+	TextInput,
+	Platform,
+} from "react-native";
 import Avatar from "./Avatar";
-import { useLoggedInUserProfile } from "@/api/users/user";
+import { updateUsername, useLoggedInUserProfile } from "@/api/users/user";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import Button from "./Button";
 
 const UserHeader = () => {
+	const [username, setUsername] = useState<string>("");
+
 	const { data: profile, isLoading, error } = useLoggedInUserProfile();
+	// const [status, setStatus] = useState("");
+	const [loading, setLoading] = useState(false);
+
+	const queryClient = useQueryClient();
+	// const { mutate: updateUsername } = useUpdateUsername();
+
+	const handleNewUsername = ({ username }: any) => {
+		setLoading(true);
+		updateUsername({ username });
+		setUsername("");
+		setLoading(false);
+	};
+
+	useEffect(() => {
+		const subscription = supabase
+			.channel("public:profiles")
+			.on(
+				"postgres_changes",
+				{ event: "*", schema: "public", table: "profiles" },
+				() => {
+					queryClient.invalidateQueries({
+						queryKey: ["loggedInUserProfile"],
+					});
+				}
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(subscription);
+		};
+	}, [queryClient, supabase]);
 
 	return (
 		<View style={styles.container}>
@@ -48,12 +91,18 @@ const UserHeader = () => {
 					</Text>
 				</View>
 				<View style={styles.nav}>
-					<Link href={`/(user)`} asChild>
-						<Pressable>
-							<FontAwesome6 name="arrow-left-long" size={25} color="#52689f" />
-						</Pressable>
-					</Link>
+					<Pressable onPress={() => router.back()}>
+						<FontAwesome6 name="arrow-left-long" size={25} color="#52689f" />
+					</Pressable>
 				</View>
+			</View>
+			<View>
+				<TextInput value={username} onChangeText={setUsername} />
+				<Button
+					disabled={loading}
+					text={loading ? "Uodating..." : "Set username"}
+					onPress={async () => handleNewUsername({ username })}
+				/>
 			</View>
 		</View>
 	);
@@ -62,7 +111,11 @@ const UserHeader = () => {
 export default UserHeader;
 
 const styles = StyleSheet.create({
-	container: { height: 100, backgroundColor: "#ecf2f6" },
+	container: {
+		height: Platform.OS === "ios" ? 200 : null,
+		marginTop: Platform.OS === "ios" ? 80 : null,
+		backgroundColor: "#ecf2f6",
+	},
 	contact: {
 		position: "relative",
 		flexGrow: 0,

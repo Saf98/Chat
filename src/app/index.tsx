@@ -17,12 +17,12 @@ const index = () => {
 	}
 
 	if (!isAdmin) {
-		<Redirect href={"/(user)"} />;
+		<Redirect href={"/(user)/contacts"} />;
 	}
 
 	return (
 		<View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
-			<Link href={"/(user)"} asChild>
+			<Link href={"/(user)/contacts"} asChild>
 				<Button text="View Profile" />
 			</Link>
 
