@@ -7,7 +7,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router/build/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Button,
 	Text,
@@ -29,10 +29,12 @@ export default function MessageScreen() {
 		userProfile?.id,
 		receiverId as string
 	);
+	const ref = useRef<FlatList>(null);
+	// let listViewRef;
 
 	const queryClient = useQueryClient();
 
-	const handleNewMessage = (payload: { new: any }) => {
+	const handleNewMessage = (payload: any) => {
 		setMessage((prevMessages: any) => [payload.new.message, ...prevMessages]);
 	};
 
@@ -60,13 +62,17 @@ export default function MessageScreen() {
 		};
 	}, [userProfile.id, receiverId, messages]);
 
-	// useRealtimeReadUpdates(userProfile?.id, receiverId as string);
+	useEffect(() => {
+		scrollToBottom();
+	}, [message]);
 
-	// const allMessages = [...(messages ?? []), ...realtimeMessages].sort(
-	// 	(a, b) =>
-	// 		new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-	// );
 	const { mutate: insertMessage } = useInsertMessage();
+
+	const scrollToBottom = () => {
+		ref.current?.scrollToEnd({
+			animated: true,
+		});
+	};
 
 	const handleSendMessage = async () => {
 		try {
@@ -79,7 +85,8 @@ export default function MessageScreen() {
 				{
 					onSuccess: () => {
 						console.log("Message sent successfully!");
-						setMessage(""); // Clear input
+						setMessage("");
+						scrollToBottom();
 					},
 					onError: (error: any) => {
 						console.error(error);
@@ -98,6 +105,9 @@ export default function MessageScreen() {
 			{isLoading && <ActivityIndicator />}
 			{messages && (
 				<FlatList
+					keyboardShouldPersistTaps="handled"
+					inverted={false}
+					onContentSizeChange={scrollToBottom}
 					data={messages}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => {

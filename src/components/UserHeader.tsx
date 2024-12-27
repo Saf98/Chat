@@ -6,6 +6,8 @@ import {
 	Pressable,
 	TextInput,
 	Platform,
+	Button,
+	TouchableOpacity,
 } from "react-native";
 import Avatar from "./Avatar";
 import { updateUsername, useLoggedInUserProfile } from "@/api/users/user";
@@ -13,11 +15,11 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Link, router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import Button from "./Button";
+// import Button from "./Button";
 
 const UserHeader = () => {
 	const [username, setUsername] = useState<string>("");
-
+	const [edit, setEdit] = useState<Boolean>(false);
 	const { data: profile, isLoading, error } = useLoggedInUserProfile();
 	// const [status, setStatus] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -27,10 +29,18 @@ const UserHeader = () => {
 
 	const handleNewUsername = ({ username }: any) => {
 		setLoading(true);
-		updateUsername({ username });
-		setUsername("");
+		if (edit) {
+			updateUsername({ username });
+		}
 		setLoading(false);
+		setEdit(!edit);
 	};
+
+	useEffect(() => {
+		if (profile) {
+			setUsername(profile.username);
+		}
+	}, [profile]);
 
 	useEffect(() => {
 		const subscription = supabase
@@ -62,15 +72,43 @@ const UserHeader = () => {
 					radius={2}
 				/>
 				<View style={styles.content}>
-					<Text
-						style={{
-							fontWeight: "500",
-							fontSize: 18,
-							color: "rgb(17 71 164)",
-						}}
-					>
-						{profile?.username}
-					</Text>
+					<View style={styles.username}>
+						{edit ? (
+							<TextInput
+								value={username}
+								onChangeText={setUsername}
+								style={{
+									fontWeight: "500",
+									fontSize: 18,
+									color: "rgb(17 71 164)",
+									backgroundColor: "white",
+									paddingTop: 0,
+									paddingBottom: 0,
+								}}
+							/>
+						) : (
+							<Text
+								style={{
+									fontWeight: "500",
+									fontSize: 18,
+									color: "rgb(17 71 164)",
+								}}
+							>
+								{profile?.username}
+							</Text>
+						)}
+						<View style={styles.editMode}>
+							<TouchableOpacity
+								onPress={async () => handleNewUsername({ username })}
+							>
+								<FontAwesome6
+									name={edit ? "check" : "pencil"}
+									size={18}
+									color="#52689f"
+								/>
+							</TouchableOpacity>
+						</View>
+					</View>
 					<Text
 						style={{
 							fontWeight: "400",
@@ -97,12 +135,13 @@ const UserHeader = () => {
 				</View>
 			</View>
 			<View>
-				<TextInput value={username} onChangeText={setUsername} />
-				<Button
-					disabled={loading}
-					text={loading ? "Uodating..." : "Set username"}
-					onPress={async () => handleNewUsername({ username })}
-				/>
+				{/* <TextInput value={username} onChangeText={setUsername} /> */}
+				{/* <Button
+					// disabled={loading}
+					text={edit ? "Updating..." : "Set username"}
+					// onPress={async () => handleNewUsername({ username })}
+					onPress={() => setEdit(!edit)}
+				/> */}
 			</View>
 		</View>
 	);
@@ -127,6 +166,14 @@ const styles = StyleSheet.create({
 	},
 	content: {
 		padding: 10,
+	},
+	username: {
+		flexDirection: "row",
+		padding: 0,
+	},
+	editMode: {
+		marginLeft: 6,
+		padding: 2,
 	},
 	nav: {
 		position: "absolute",
