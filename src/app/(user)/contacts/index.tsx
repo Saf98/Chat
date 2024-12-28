@@ -7,7 +7,11 @@ import { FlatList, Pressable, StyleSheet } from "react-native";
 const ContactsScreen = () => {
 	const { data: profiles } = useProfiles();
 	const { data: profile, isLoading, error } = useLoggedInUserProfile();
-	const filteredProfiles = profiles?.filter((el) => el.id !== profile.id);
+
+	const filteredProfiles = profiles?.filter((contact) => {
+		if (!contact) return;
+		return contact?.id !== profile?.id;
+	});
 	return (
 		<View>
 			<FlatList
