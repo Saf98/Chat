@@ -58,7 +58,11 @@ function RootLayoutNav() {
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
 			<AuthProvider>
 				<QueryProvider>
-					<Stack />
+					<Stack
+						screenOptions={{
+							headerShown: false, // Disables the header for all screens
+						}}
+					/>
 				</QueryProvider>
 			</AuthProvider>
 		</ThemeProvider>

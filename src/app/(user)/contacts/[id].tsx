@@ -7,7 +7,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router/build/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Button,
 	Text,
@@ -16,6 +16,7 @@ import {
 	StyleSheet,
 	ActivityIndicator,
 	FlatList,
+	SafeAreaView,
 } from "react-native";
 
 export default function MessageScreen() {
@@ -29,10 +30,11 @@ export default function MessageScreen() {
 		userProfile?.id,
 		receiverId as string
 	);
+	const ref = useRef<FlatList>(null);
 
 	const queryClient = useQueryClient();
 
-	const handleNewMessage = (payload: { new: any }) => {
+	const handleNewMessage = (payload: any) => {
 		setMessage((prevMessages: any) => [payload.new.message, ...prevMessages]);
 	};
 
@@ -60,13 +62,17 @@ export default function MessageScreen() {
 		};
 	}, [userProfile.id, receiverId, messages]);
 
-	// useRealtimeReadUpdates(userProfile?.id, receiverId as string);
+	useEffect(() => {
+		scrollToBottom();
+	}, [message]);
 
-	// const allMessages = [...(messages ?? []), ...realtimeMessages].sort(
-	// 	(a, b) =>
-	// 		new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-	// );
 	const { mutate: insertMessage } = useInsertMessage();
+
+	const scrollToBottom = () => {
+		ref.current?.scrollToEnd({
+			animated: true,
+		});
+	};
 
 	const handleSendMessage = async () => {
 		try {
@@ -79,7 +85,8 @@ export default function MessageScreen() {
 				{
 					onSuccess: () => {
 						console.log("Message sent successfully!");
-						setMessage(""); // Clear input
+						setMessage("");
+						scrollToBottom();
 					},
 					onError: (error: any) => {
 						console.error(error);
@@ -93,21 +100,60 @@ export default function MessageScreen() {
 	};
 
 	return (
-		<View style={styles.container}>
-			<Text>Messaging {profile?.username}</Text>
+		<SafeAreaView style={styles.container}>
 			{isLoading && <ActivityIndicator />}
 			{messages && (
-				<FlatList
-					data={messages}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => {
-						return item.sender_id === userProfile.id ? (
-							<Text style={{ textAlign: "right" }}>{item.message}</Text>
-						) : (
-							<Text style={{ textAlign: "left" }}>{item.message}</Text>
-						);
-					}}
-				/>
+				<View style={styles.wrapper}>
+					<FlatList
+						ref={ref}
+						keyboardShouldPersistTaps="handled"
+						inverted={false}
+						onContentSizeChange={scrollToBottom}
+						data={messages}
+						keyExtractor={(item) => item.id}
+						renderItem={({ item }) => {
+							return item.sender_id === userProfile.id ? (
+								<View
+									style={{
+										backgroundColor: "#8ea9d9",
+										marginTop: 10,
+										padding: 10,
+										borderRadius: 15,
+										alignSelf: "flex-end",
+										borderTopRightRadius: 0,
+									}}
+								>
+									<Text
+										style={{
+											color: "#ffffff",
+										}}
+									>
+										{item.message}
+									</Text>
+								</View>
+							) : (
+								<View
+									style={{
+										backgroundColor: "#ffffff",
+										marginTop: 10,
+										padding: 10,
+										borderRadius: 15,
+										borderTopLeftRadius: 0,
+										alignSelf: "flex-start",
+									}}
+								>
+									<Text
+										style={{
+											color: "#7b99cd",
+										}}
+									>
+										{item.message}
+									</Text>
+								</View>
+							);
+						}}
+					/>
+				</View>
 			)}
 			<TextInput
 				placeholder="Type your message..."
@@ -116,18 +162,23 @@ export default function MessageScreen() {
 				editable={!isLoading} // Disable input while sending
 			/>
 			<Button title="Send" onPress={handleSendMessage} disabled={isLoading} />
-		</View>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingTop: 22,
+		paddingTop: 0,
+	},
+	wrapper: {
+		flex: 1,
+		backgroundColor: "none",
 	},
 	item: {
 		padding: 10,
 		fontSize: 18,
 		height: 44,
+		marginBottom: 70,
 	},
 });
