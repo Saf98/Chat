@@ -5,6 +5,8 @@ node_modules
 
 # Android
 android/
+android/gradle.properties
+android/local.properties
 
 # Expo
 .expo/

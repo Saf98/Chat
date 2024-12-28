@@ -113,7 +113,7 @@ const UserHeader = () => {
 									color: "rgb(17 71 164)",
 								}}
 							>
-								{profile?.username}
+								{profile?.username || "Set username"}
 							</Text>
 						)}
 						<View style={styles.editMode}>
@@ -149,6 +149,9 @@ const UserHeader = () => {
 									backgroundColor: "white",
 									paddingTop: 0,
 									paddingBottom: 0,
+									borderRadius: 25,
+									width: 100,
+									transitionDelay: "1000s",
 									fontStyle: "italic",
 								}}
 							/>
