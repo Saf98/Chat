@@ -9,7 +9,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router/build/hooks";
 import { useEffect, useRef, useState } from "react";
 import {
-	Button,
 	Text,
 	TextInput,
 	View,
@@ -17,7 +16,9 @@ import {
 	ActivityIndicator,
 	FlatList,
 	SafeAreaView,
+	Pressable,
 } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function MessageScreen() {
 	const [message, setMessage] = useState<any>("");
@@ -155,13 +156,33 @@ export default function MessageScreen() {
 					/>
 				</View>
 			)}
-			<TextInput
-				placeholder="Type your message..."
-				value={message}
-				onChangeText={setMessage}
-				editable={!isLoading} // Disable input while sending
-			/>
-			<Button title="Send" onPress={handleSendMessage} disabled={isLoading} />
+			<View
+				style={{
+					flexGrow: 0,
+					flexShrink: 0,
+					flexDirection: "row",
+					margin: 10,
+					justifyContent: "space-between",
+					padding: 12,
+					borderRadius: 16,
+					borderWidth: 2,
+					borderColor: "black",
+					backgroundColor: "white",
+				}}
+			>
+				<TextInput
+					placeholder="Type your message..."
+					value={message}
+					onChangeText={setMessage}
+					editable={!isLoading}
+					style={{ paddingTop: 0, paddingBottom: 0 }}
+				/>
+				<View style={{ maxWidth: "auto", backgroundColor: "white" }}>
+					<Pressable onPress={handleSendMessage} disabled={isLoading}>
+						<MaterialIcons name="send" size={28} color="black" />
+					</Pressable>
+				</View>
+			</View>
 		</SafeAreaView>
 	);
 }
@@ -174,6 +195,7 @@ const styles = StyleSheet.create({
 	wrapper: {
 		flex: 1,
 		backgroundColor: "none",
+		padding: 10,
 	},
 	item: {
 		padding: 10,
