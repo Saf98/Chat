@@ -12,6 +12,7 @@ const ContactsScreen = () => {
 		if (!contact) return;
 		return contact?.id !== profile?.id;
 	});
+    
 	return (
 		<View style={styles.container}>
 			<FlatList
