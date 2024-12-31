@@ -7,6 +7,7 @@ const Avatar = ({
 	marginLeft,
 	marginBottom,
 	radius,
+	status,
 }: any) => {
 	const frame = "../../assets/images/frame.png";
 	// 119
@@ -15,7 +16,14 @@ const Avatar = ({
 	return (
 		<LinearGradient
 			// Background Linear Gradient
-			colors={["#D6FFDB00", "#D6FFDB", "#66FF00"]}
+			// colors={["#D6FFDB00", "#D6FFDB", "#66FF00"]} online
+			// #FF9A0000 0%, #D8820055 30%,  #fca30d 100%); offline
+
+			colors={
+				status
+					? ["#D6FFDB00", "#D6FFDB", "#66FF00"]
+					: ["#FF9A0000", "#D8820055", "#FCA30D"]
+			}
 			start={{ x: 2, y: 0 }}
 			end={{ x: 0, y: 1 }}
 			style={[styles.gradientBox, { width: frameSize, height: frameSize }]}

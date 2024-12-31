@@ -1,12 +1,12 @@
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import Button from "@components/Button";
 import Colors from "../../constants/Colors";
 import { Link, Redirect, Stack } from "expo-router";
 import { supabase } from "src/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
 import CustomInput from "@/components/CustomInput";
 import { useForm } from "react-hook-form";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SignInScreen = () => {
 	const [loading, setLoading] = useState(false);
@@ -15,9 +15,9 @@ const SignInScreen = () => {
 
 	const { control, handleSubmit } = useForm();
 
-	// if (session) {
-	// 	return <Redirect href={"/(user)/contacts"} />;
-	// }
+	if (session) {
+		return <Redirect href={"/(user)/contacts"} />;
+	}
 
 	async function signInWithEmail({ email, password }: any) {
 		setLoading(true);
@@ -26,12 +26,17 @@ const SignInScreen = () => {
 			password,
 		});
 
-		if (error) Alert.alert(error.message);
+		if (error) Alert.alert("Please enter credentials");
 		setLoading(false);
 	}
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
+			<View style={styles.card}>
+				<Text style={{ fontSize: 30, fontWeight: 600, textAlign: "center" }}>
+					Sign Into Your Account
+				</Text>
+			</View>
 			<CustomInput
 				control={control}
 				name={"email"}
@@ -50,15 +55,17 @@ const SignInScreen = () => {
 				}}
 			/>
 
-			<Button
+			<TouchableOpacity
 				onPress={handleSubmit(signInWithEmail)}
+				style={styles.button}
 				disabled={loading}
-				text={loading ? "Signing in..." : "Sign in"}
-			/>
+			>
+				<Text style={{ color: "white", fontSize: 18 }}>Login</Text>
+			</TouchableOpacity>
 			<Link href="/sign-up" style={styles.textButton}>
 				Create an account
 			</Link>
-		</View>
+		</SafeAreaView>
 	);
 };
 
@@ -67,6 +74,16 @@ const styles = StyleSheet.create({
 		padding: 20,
 		justifyContent: "center",
 		flex: 1,
+	},
+	card: {
+		padding: 20,
+		alignContent: "center",
+	},
+	button: {
+		borderRadius: 15,
+		alignItems: "center",
+		backgroundColor: Colors.light.tint,
+		padding: 20,
 	},
 	textButton: {
 		alignSelf: "center",

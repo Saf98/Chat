@@ -5,10 +5,9 @@ import {
 	StyleSheet,
 	Pressable,
 	TextInput,
-	Platform,
-	Button,
 	TouchableOpacity,
 	SafeAreaView,
+	ActivityIndicator,
 } from "react-native";
 import Avatar from "./Avatar";
 import {
@@ -17,10 +16,9 @@ import {
 	useLoggedInUserProfile,
 } from "@/api/users/user";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-// import Button from "./Button";
 
 const UserHeader = () => {
 	const [username, setUsername] = useState<string>("");
@@ -76,16 +74,17 @@ const UserHeader = () => {
 			supabase.removeChannel(subscription);
 		};
 	}, [queryClient, supabase]);
-
+	if (loading) return <ActivityIndicator />;
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.contact}>
 				<Avatar
 					frameSize={75}
 					avatarSize={60}
-					marginLeft={5}
+					marginLeft={6}
 					marginBottom={3}
 					radius={2}
+					status={profile}
 				/>
 				<View style={styles.content}>
 					<View style={styles.username}>

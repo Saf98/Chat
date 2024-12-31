@@ -7,9 +7,14 @@ import { FlatList, Pressable, StyleSheet } from "react-native";
 const ContactsScreen = () => {
 	const { data: profiles } = useProfiles();
 	const { data: profile, isLoading, error } = useLoggedInUserProfile();
-	const filteredProfiles = profiles?.filter((el) => el?.id !== profile?.id);
+
+	const filteredProfiles = profiles?.filter((contact) => {
+		if (!contact) return;
+		return contact?.id !== profile?.id;
+	});
+    
 	return (
-		<View>
+		<View style={styles.container}>
 			<FlatList
 				data={filteredProfiles}
 				renderItem={({ item }) => (
@@ -57,7 +62,7 @@ export default ContactsScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingTop: 22,
+		backgroundColor: "#f7f9fa",
 	},
 	contact: {
 		flex: 1,
@@ -65,8 +70,12 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 		padding: 10,
 		alignItems: "center",
+		borderBottomWidth: 1,
+		borderBottomColor: "gray",
+		backgroundColor: "#f7f9fa",
 	},
 	content: {
 		padding: 10,
+		backgroundColor: "#f7f9fa",
 	},
 });
