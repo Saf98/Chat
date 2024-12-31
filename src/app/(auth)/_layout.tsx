@@ -7,5 +7,11 @@ export default function AuthLayout() {
 	if (session) {
 		return <Redirect href={"/"} />;
 	}
-	return <Stack />;
+	return (
+		<Stack
+			screenOptions={{
+				headerShown: false, // Disables the header for all screens
+			}}
+		/>
+	);
 }

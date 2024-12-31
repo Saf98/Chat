@@ -17,9 +17,16 @@ import {
 	FlatList,
 	SafeAreaView,
 	Pressable,
+	Button,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
+import Animated, {
+	useSharedValue,
+	withTiming,
+	useAnimatedStyle,
+	withRepeat,
+	withSequence,
+} from "react-native-reanimated";
 export default function MessageScreen() {
 	const [message, setMessage] = useState<any>("");
 
@@ -100,6 +107,25 @@ export default function MessageScreen() {
 		}
 	};
 
+	const offset = useSharedValue<number>(0);
+
+	const style = useAnimatedStyle(() => ({
+		transform: [{ translateX: offset.value }],
+	}));
+
+	const OFFSET = 20;
+	const TIME = 60;
+
+	const handlePress = () => {
+		offset.value = withSequence(
+			withTiming(-OFFSET, { duration: TIME / 2 }),
+			// shake between -OFFSET and OFFSET 5 times
+			withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true),
+			// go back to 0 at the end
+			withTiming(0, { duration: TIME / 2 })
+		);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			{isLoading && <ActivityIndicator />}
@@ -114,16 +140,7 @@ export default function MessageScreen() {
 						keyExtractor={(item) => item.id}
 						renderItem={({ item }) => {
 							return item.sender_id === userProfile.id ? (
-								<View
-									style={{
-										backgroundColor: "#8ea9d9",
-										marginTop: 10,
-										padding: 10,
-										borderRadius: 15,
-										alignSelf: "flex-end",
-										borderTopRightRadius: 0,
-									}}
-								>
+								<Animated.View style={[styles.sender, style]}>
 									<Text
 										style={{
 											color: "#ffffff",
@@ -131,18 +148,9 @@ export default function MessageScreen() {
 									>
 										{item.message}
 									</Text>
-								</View>
+								</Animated.View>
 							) : (
-								<View
-									style={{
-										backgroundColor: "#ffffff",
-										marginTop: 10,
-										padding: 10,
-										borderRadius: 15,
-										borderTopLeftRadius: 0,
-										alignSelf: "flex-start",
-									}}
-								>
+								<Animated.View style={[styles.receiver, style]}>
 									<Text
 										style={{
 											color: "#7b99cd",
@@ -150,7 +158,7 @@ export default function MessageScreen() {
 									>
 										{item.message}
 									</Text>
-								</View>
+								</Animated.View>
 							);
 						}}
 					/>
@@ -183,6 +191,7 @@ export default function MessageScreen() {
 					</Pressable>
 				</View>
 			</View>
+			<Button title="nudge" onPress={handlePress} />
 		</SafeAreaView>
 	);
 }
@@ -197,10 +206,33 @@ const styles = StyleSheet.create({
 		backgroundColor: "none",
 		padding: 10,
 	},
+	sender: {
+		backgroundColor: "#8ea9d9",
+		marginTop: 10,
+		padding: 10,
+		borderRadius: 15,
+		alignSelf: "flex-end",
+		borderTopRightRadius: 0,
+	},
+	receiver: {
+		backgroundColor: "#ffffff",
+		marginTop: 10,
+		padding: 10,
+		borderRadius: 15,
+		borderTopLeftRadius: 0,
+		alignSelf: "flex-start",
+	},
 	item: {
 		padding: 10,
 		fontSize: 18,
 		height: 44,
 		marginBottom: 70,
+	},
+	box: {
+		width: 100,
+		height: 100,
+		margin: 50,
+		borderRadius: 15,
+		backgroundColor: "#b58df1",
 	},
 });

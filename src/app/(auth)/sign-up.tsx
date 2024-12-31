@@ -1,10 +1,8 @@
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import Button from "@components/Button";
 import Colors from "@constants/Colors";
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import { supabase } from "src/lib/supabase";
-import Avatar from "@/components/Avatar";
 import { useForm } from "react-hook-form";
 import CustomInput from "@/components/CustomInput";
 import { EMAIL_REGEX } from "@/constants/Utils";
@@ -19,12 +17,19 @@ const SignUpScreen = () => {
 		setLoading(true);
 		const { error } = await supabase.auth.signUp({ email, password });
 
-		if (error) Alert.alert(error.message);
+		if (error) {
+			Alert.alert("Please enter credentials");
+		}
 		setLoading(false);
 	}
 
 	return (
 		<View style={styles.container}>
+			<View style={styles.card}>
+				<Text style={{ fontSize: 30, fontWeight: 600, textAlign: "center" }}>
+					Create an account
+				</Text>
+			</View>
 			<CustomInput
 				control={control}
 				name={"email"}
@@ -62,14 +67,18 @@ const SignUpScreen = () => {
 				}}
 			/>
 
-			<Button
+			<TouchableOpacity
 				onPress={handleSubmit(signUpWithEmail)}
+				style={styles.button}
 				disabled={loading}
-				text={loading ? "Creating account..." : "Create account"}
-			/>
-			<Text>
+			>
+				<Text style={{ color: "white", fontSize: 18 }}>
+					{loading ? "Creating account..." : "Create account"}
+				</Text>
+			</TouchableOpacity>
+			<Text style={styles.textButton}>
 				Already have an account? &nbsp;
-				<Link href="/sign-in" style={styles.textButton}>
+				<Link style={{ color: Colors.light.tint }} href="/sign-in">
 					Sign in
 				</Link>
 			</Text>
@@ -83,10 +92,20 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		flex: 1,
 	},
+	card: {
+		padding: 20,
+		alignContent: "center",
+	},
+	button: {
+		borderRadius: 15,
+		alignItems: "center",
+		backgroundColor: Colors.light.tint,
+		padding: 20,
+	},
 	textButton: {
+		textAlign: "center",
 		alignSelf: "center",
 		fontWeight: "bold",
-		color: Colors.light.tint,
 		marginVertical: 10,
 	},
 });
