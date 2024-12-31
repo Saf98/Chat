@@ -8,6 +8,9 @@ android/
 android/gradle.properties
 android/local.properties
 
+# iOS
+ios/
+
 # Expo
 .expo/
 dist/
