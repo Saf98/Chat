@@ -1,4 +1,11 @@
-import { View, TextInput, StyleSheet, Text, Platform } from "react-native";
+import {
+	View,
+	TextInput,
+	StyleSheet,
+	Text,
+	Platform,
+	StyleProp,
+} from "react-native";
 import {
 	Control,
 	Controller,
@@ -10,10 +17,12 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface CustomInputProps {
 	control: Control<FieldValues>;
-	name: string;
+	name?: string | any;
 	rules?: RegisterOptions;
 	placeholder: string;
+	editable?: boolean;
 	secureTextEntry: boolean;
+	styles?: any;
 }
 
 const CustomInput = ({
@@ -21,7 +30,9 @@ const CustomInput = ({
 	control,
 	rules = {},
 	placeholder,
+	editable,
 	secureTextEntry,
+	styles,
 }: CustomInputProps) => {
 	const iconMap: Record<string, { library: any; name: string }> = {
 		email: { library: AntDesign, name: "mail" },
@@ -30,7 +41,7 @@ const CustomInput = ({
 	};
 
 	const IconComponent = iconMap[name]?.library || AntDesign;
-	const iconName = iconMap[name]?.name || "questioncircleo";
+	const iconName = iconMap[name]?.name || "";
 	return (
 		<Controller
 			name={name}
@@ -54,6 +65,7 @@ const CustomInput = ({
 						/>
 						<TextInput
 							placeholder={placeholder}
+							editable={editable}
 							onBlur={onBlur}
 							onChangeText={onChange}
 							value={value}
@@ -77,34 +89,34 @@ const CustomInput = ({
 	);
 };
 
-const styles = StyleSheet.create({
-	inputContainer: {
-		flexGrow: 0,
-		flexShrink: 1,
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#f6f8fc",
-		marginBottom: 10,
-		borderWidth: 1,
-		borderRadius: 15,
-		borderColor: "#f6f8fc",
-		maxWidth: "auto",
-		padding: Platform.OS === "ios" ? 20 : 6,
-	},
-	input: {
-		flex: 1,
-		backgroundColor: "#f6f8fc",
-		color: "#424242",
-		fontSize: 18,
-		marginLeft: Platform.OS === "ios" ? 5 : null,
-	},
-	borderTrue: {
-		borderColor: "rgb(17 71 164)",
-	},
-	borderFalse: {
-		borderColor: "red",
-	},
-});
+// const styles = StyleSheet.create({
+// 	inputContainer: {
+// 		flexGrow: 0,
+// 		flexShrink: 1,
+// 		flexDirection: "row",
+// 		justifyContent: "center",
+// 		alignItems: "center",
+// 		backgroundColor: "#f6f8fc",
+// 		marginBottom: 10,
+// 		borderWidth: 1,
+// 		borderRadius: 15,
+// 		borderColor: "#f6f8fc",
+// 		maxWidth: "auto",
+// 		padding: Platform.OS === "ios" ? 20 : 6,
+// 	},
+// 	input: {
+// 		flex: 1,
+// 		backgroundColor: "#f6f8fc",
+// 		color: "#424242",
+// 		fontSize: 18,
+// 		marginLeft: Platform.OS === "ios" ? 5 : null,
+// 	},
+// 	borderTrue: {
+// 		borderColor: "rgb(17 71 164)",
+// 	},
+// 	borderFalse: {
+// 		borderColor: "red",
+// 	},
+// });
 
 export default CustomInput;

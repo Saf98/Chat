@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import {
+	View,
+	Text,
+	StyleSheet,
+	Alert,
+	TouchableOpacity,
+	Platform,
+	StyleSheetProperties,
+} from "react-native";
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import { Link, Redirect, Stack } from "expo-router";
@@ -7,6 +15,36 @@ import { useAuth } from "@/providers/AuthProvider";
 import CustomInput from "@/components/CustomInput";
 import { useForm } from "react-hook-form";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const inputStyles = StyleSheet.create({
+	inputContainer: {
+		flexGrow: 0,
+		flexShrink: 1,
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#f6f8fc",
+		marginBottom: 10,
+		borderWidth: 1,
+		borderRadius: 15,
+		borderColor: "#f6f8fc",
+		maxWidth: "auto",
+		padding: Platform.OS === "ios" ? 20 : 6,
+	},
+	input: {
+		flex: 1,
+		backgroundColor: "#f6f8fc",
+		color: "#424242",
+		fontSize: 18,
+		marginLeft: Platform.OS === "ios" ? 5 : null,
+	},
+	borderTrue: {
+		borderColor: "rgb(17 71 164)",
+	},
+	borderFalse: {
+		borderColor: "red",
+	},
+});
 
 const SignInScreen = () => {
 	const [loading, setLoading] = useState(false);
@@ -31,8 +69,8 @@ const SignInScreen = () => {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.card}>
+		<SafeAreaView style={signInStyles.container}>
+			<View style={signInStyles.card}>
 				<Text style={{ fontSize: 30, fontWeight: 600, textAlign: "center" }}>
 					Sign Into Your Account
 				</Text>
@@ -41,35 +79,39 @@ const SignInScreen = () => {
 				control={control}
 				name={"email"}
 				placeholder={"test@supabase.com"}
+				editable={true}
 				secureTextEntry={false}
 				rules={{ required: "Email is required" }}
+				styles={inputStyles}
 			/>
 			<CustomInput
 				control={control}
 				name={"password"}
 				placeholder={"password"}
+				editable={true}
 				secureTextEntry={true}
 				rules={{
 					required: "Password is required",
 					minLength: { value: 6, message: "Minimum of 6 characters required" },
 				}}
+				styles={inputStyles}
 			/>
 
 			<TouchableOpacity
 				onPress={handleSubmit(signInWithEmail)}
-				style={styles.button}
+				style={signInStyles.button}
 				disabled={loading}
 			>
 				<Text style={{ color: "white", fontSize: 18 }}>Login</Text>
 			</TouchableOpacity>
-			<Link href="/sign-up" style={styles.textButton}>
+			<Link href="/sign-up" style={signInStyles.textButton}>
 				Create an account
 			</Link>
 		</SafeAreaView>
 	);
 };
 
-const styles = StyleSheet.create({
+const signInStyles = StyleSheet.create({
 	container: {
 		padding: 20,
 		justifyContent: "center",

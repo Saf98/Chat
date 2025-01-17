@@ -27,8 +27,10 @@ import Animated, {
 	withRepeat,
 	withSequence,
 } from "react-native-reanimated";
+import CustomInput from "@/components/CustomInput";
+import { useForm } from "react-hook-form";
 export default function MessageScreen() {
-	const [message, setMessage] = useState<any>("");
+	const [message, setMessage] = useState<string[]>();
 
 	const { id: receiverId } = useLocalSearchParams();
 
@@ -42,7 +44,10 @@ export default function MessageScreen() {
 
 	const queryClient = useQueryClient();
 
+	const { control, handleSubmit, reset } = useForm();
+
 	const handleNewMessage = (payload: any) => {
+		console.log(payload.new.message);
 		setMessage((prevMessages: any) => [payload.new.message, ...prevMessages]);
 	};
 
@@ -82,8 +87,19 @@ export default function MessageScreen() {
 		});
 	};
 
-	const handleSendMessage = async () => {
+	function handleNudge() {
+		offset.value = withSequence(
+			withTiming(-OFFSET, { duration: TIME / 2 }),
+			// shake between -OFFSET and OFFSET 5 times
+			withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true),
+			// go back to 0 at the end
+			withTiming(0, { duration: TIME / 2 })
+		);
+	}
+
+	const handleSendMessage = async (data: any): Promise<void> => {
 		try {
+			const { message } = data;
 			insertMessage(
 				{
 					sender_id: userProfile?.id,
@@ -93,7 +109,7 @@ export default function MessageScreen() {
 				{
 					onSuccess: () => {
 						console.log("Message sent successfully!");
-						setMessage("");
+						reset();
 						scrollToBottom();
 					},
 					onError: (error: any) => {
@@ -117,13 +133,7 @@ export default function MessageScreen() {
 	const TIME = 60;
 
 	const handlePress = () => {
-		offset.value = withSequence(
-			withTiming(-OFFSET, { duration: TIME / 2 }),
-			// shake between -OFFSET and OFFSET 5 times
-			withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true),
-			// go back to 0 at the end
-			withTiming(0, { duration: TIME / 2 })
-		);
+		handleNudge();
 	};
 
 	return (
@@ -164,37 +174,81 @@ export default function MessageScreen() {
 					/>
 				</View>
 			)}
-			<View
-				style={{
-					flexGrow: 0,
-					flexShrink: 0,
-					flexDirection: "row",
-					margin: 10,
-					justifyContent: "space-between",
-					padding: 12,
-					borderRadius: 16,
-					borderWidth: 2,
-					borderColor: "black",
-					backgroundColor: "white",
-				}}
+			{/* <View 
+			// style={{
+			// 	flexGrow: 0,
+			// 	flexShrink: 0,
+			// 	flexDirection: "row",
+			// 	margin: 10,
+			// 	justifyContent: "space-between",
+			// 	padding: 12,
+			// 	borderRadius: 16,
+			// 	borderWidth: 2,
+			// 	borderColor: "black",
+			// 	backgroundColor: "white",
+			// }}
 			>
-				<TextInput
+				{/* <TextInput
 					placeholder="Type your message..."
 					value={message}
 					onChangeText={setMessage}
 					editable={!isLoading}
 					style={{ paddingTop: 0, paddingBottom: 0 }}
-				/>
-				<View style={{ maxWidth: "auto", backgroundColor: "white" }}>
-					<Pressable onPress={handleSendMessage} disabled={isLoading}>
-						<MaterialIcons name="send" size={28} color="black" />
-					</Pressable>
-				</View>
+				/> */}
+			<CustomInput
+				control={control}
+				name={""}
+				placeholder={"Enter a message"}
+				editable={!isLoading}
+				secureTextEntry={false}
+				rules={{
+					required: "message is required",
+					minLength: {
+						value: 1,
+						message: "Please enter message",
+					},
+				}}
+				styles={messageStyle}
+			/>
+			<View
+				style={{
+					maxWidth: "auto",
+					backgroundColor: "white",
+					flexShrink: 1,
+					flexGrow: 0,
+				}}
+			>
+				<Pressable
+					onPress={handleSubmit(handleSendMessage)}
+					disabled={isLoading}
+				>
+					<MaterialIcons name="send" size={28} color="black" />
+				</Pressable>
 			</View>
-			<Button title="nudge" onPress={handlePress} />
+			{/* </View> */}
+			{/* <Button title="nudge" onPress={handlePress} /> */}
 		</SafeAreaView>
 	);
 }
+
+const messageStyle = StyleSheet.create({
+	inputContainer: {
+		flexGrow: 0,
+		flexShrink: 0,
+		flexDirection: "row",
+		margin: 10,
+		padding: 12,
+		borderRadius: 16,
+		borderWidth: 2,
+		borderColor: "black",
+		backgroundColor: "white",
+		width: "50%",
+	},
+	input: {
+		paddingTop: 0,
+		paddingBottom: 0,
+	},
+});
 
 const styles = StyleSheet.create({
 	container: {
