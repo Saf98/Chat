@@ -10,14 +10,12 @@ import { useLocalSearchParams } from "expo-router/build/hooks";
 import { useEffect, useRef, useState } from "react";
 import {
 	Text,
-	TextInput,
 	View,
 	StyleSheet,
 	ActivityIndicator,
 	FlatList,
 	SafeAreaView,
 	Pressable,
-	Button,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Animated, {
@@ -28,36 +26,58 @@ import Animated, {
 	withSequence,
 } from "react-native-reanimated";
 import CustomInput from "@/components/CustomInput";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+
 export default function MessageScreen() {
-	const [message, setMessage] = useState<string[]>();
+	const [newMessage, setNewMessage] = useState<NewMessageType[]>([]);
 
 	const { id: receiverId } = useLocalSearchParams();
-
 	const { data: profile, isLoading } = useProfile(receiverId as string);
 	const { data: userProfile } = useLoggedInUserProfile();
 	const { data: messages } = useReadMessage(
 		userProfile?.id,
 		receiverId as string
 	);
+
 	const ref = useRef<FlatList>(null);
+
+	type NewMessageType = {
+		id: string;
+		message: string;
+		created_at: string;
+		sender_id: string;
+		receiver_id: string;
+		read: boolean;
+	};
 
 	const queryClient = useQueryClient();
 
 	const { control, handleSubmit, reset } = useForm();
 
-	const handleNewMessage = (payload: any) => {
-		console.log(payload.new.message);
-		setMessage((prevMessages: any) => [payload.new.message, ...prevMessages]);
-	};
+	function handleNewMessage(
+		payload: RealtimePostgresChangesPayload<NewMessageType>
+	) {
+		if (
+			!payload ||
+			!payload.new ||
+			typeof payload.new !== "object" ||
+			payload.new === null
+		) {
+			return;
+		} else {
+			const newMessage = payload.new;
+			setNewMessage((prevMessages: any) => [newMessage, ...prevMessages]);
+		}
+	}
 
 	useEffect(() => {
 		const subscription = supabase
 			.channel("messages")
-			.on(
+			.on<NewMessageType>(
 				"postgres_changes",
 				{
-					event: "*",
+					event: "INSERT",
 					schema: "public",
 					table: "messages",
 				},
@@ -77,7 +97,7 @@ export default function MessageScreen() {
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [message]);
+	}, [newMessage]);
 
 	const { mutate: insertMessage } = useInsertMessage();
 
@@ -104,7 +124,7 @@ export default function MessageScreen() {
 				{
 					sender_id: userProfile?.id,
 					receiver_id: receiverId as string,
-					message,
+					message: message as string,
 				},
 				{
 					onSuccess: () => {
@@ -174,58 +194,51 @@ export default function MessageScreen() {
 					/>
 				</View>
 			)}
-			{/* <View 
-			// style={{
-			// 	flexGrow: 0,
-			// 	flexShrink: 0,
-			// 	flexDirection: "row",
-			// 	margin: 10,
-			// 	justifyContent: "space-between",
-			// 	padding: 12,
-			// 	borderRadius: 16,
-			// 	borderWidth: 2,
-			// 	borderColor: "black",
-			// 	backgroundColor: "white",
-			// }}
-			>
-				{/* <TextInput
-					placeholder="Type your message..."
-					value={message}
-					onChangeText={setMessage}
-					editable={!isLoading}
-					style={{ paddingTop: 0, paddingBottom: 0 }}
-				/> */}
-			<CustomInput
-				control={control}
-				name={""}
-				placeholder={"Enter a message"}
-				editable={!isLoading}
-				secureTextEntry={false}
-				rules={{
-					required: "message is required",
-					minLength: {
-						value: 1,
-						message: "Please enter message",
-					},
-				}}
-				styles={messageStyle}
-			/>
 			<View
 				style={{
-					maxWidth: "auto",
-					backgroundColor: "white",
-					flexShrink: 1,
 					flexGrow: 0,
+					flexShrink: 0,
+					flexDirection: "row",
+					margin: 10,
+					justifyContent: "space-between",
+					borderRadius: 16,
+					backgroundColor: "white",
 				}}
 			>
-				<Pressable
-					onPress={handleSubmit(handleSendMessage)}
-					disabled={isLoading}
+				<CustomInput
+					control={control}
+					name={"message"}
+					placeholder={"Enter a message"}
+					editable={!isLoading}
+					secureTextEntry={false}
+					rules={{
+						required: "message is required",
+						minLength: {
+							value: 1,
+							message: "Please enter message",
+						},
+					}}
+					styles={messageStyle}
+				/>
+				<View
+					style={{
+						maxWidth: "auto",
+						backgroundColor: "white",
+						flexShrink: 1,
+						flexGrow: 0,
+						marginTop: 5,
+						marginRight: 20,
+					}}
 				>
-					<MaterialIcons name="send" size={28} color="black" />
-				</Pressable>
+					<Pressable
+						onPress={handleSubmit(handleSendMessage)}
+						disabled={isLoading}
+						hitSlop={10}
+					>
+						<MaterialIcons name="send" size={28} color="black" />
+					</Pressable>
+				</View>
 			</View>
-			{/* </View> */}
 			{/* <Button title="nudge" onPress={handlePress} /> */}
 		</SafeAreaView>
 	);
@@ -233,16 +246,12 @@ export default function MessageScreen() {
 
 const messageStyle = StyleSheet.create({
 	inputContainer: {
-		flexGrow: 0,
+		flexGrow: 1,
 		flexShrink: 0,
 		flexDirection: "row",
 		margin: 10,
-		padding: 12,
-		borderRadius: 16,
-		borderWidth: 2,
-		borderColor: "black",
+		padding: 2,
 		backgroundColor: "white",
-		width: "50%",
 	},
 	input: {
 		paddingTop: 0,

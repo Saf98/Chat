@@ -17,7 +17,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface CustomInputProps {
 	control: Control<FieldValues>;
-	name?: string | any;
+	name: string;
 	rules?: RegisterOptions;
 	placeholder: string;
 	editable?: boolean;
