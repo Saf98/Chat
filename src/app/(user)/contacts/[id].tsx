@@ -28,12 +28,12 @@ import Animated, {
 import CustomInput from "@/components/CustomInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function MessageScreen() {
 	const [newMessage, setNewMessage] = useState<NewMessageType[]>([]);
-
 	const { id: receiverId } = useLocalSearchParams();
-	const { data: profile, isLoading } = useProfile(receiverId as string);
+	const { isLoading } = useProfile(receiverId as string);
 	const { data: userProfile } = useLoggedInUserProfile();
 	const { data: messages } = useReadMessage(
 		userProfile?.id,
@@ -49,6 +49,7 @@ export default function MessageScreen() {
 		sender_id: string;
 		receiver_id: string;
 		read: boolean;
+		nudge: boolean;
 	};
 
 	const queryClient = useQueryClient();
@@ -65,10 +66,9 @@ export default function MessageScreen() {
 			payload.new === null
 		) {
 			return;
-		} else {
-			const newMessage = payload.new;
-			setNewMessage((prevMessages: any) => [newMessage, ...prevMessages]);
 		}
+		const newMessage = payload.new;
+		setNewMessage((prevMessages: any) => [newMessage, ...prevMessages]);
 	}
 
 	useEffect(() => {
@@ -107,19 +107,10 @@ export default function MessageScreen() {
 		});
 	};
 
-	function handleNudge() {
-		offset.value = withSequence(
-			withTiming(-OFFSET, { duration: TIME / 2 }),
-			// shake between -OFFSET and OFFSET 5 times
-			withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true),
-			// go back to 0 at the end
-			withTiming(0, { duration: TIME / 2 })
-		);
-	}
-
 	const handleSendMessage = async (data: any): Promise<void> => {
 		try {
 			const { message } = data;
+
 			insertMessage(
 				{
 					sender_id: userProfile?.id,
@@ -145,15 +136,45 @@ export default function MessageScreen() {
 
 	const offset = useSharedValue<number>(0);
 
-	const style = useAnimatedStyle(() => ({
+	const animationStyle = useAnimatedStyle(() => ({
 		transform: [{ translateX: offset.value }],
 	}));
 
 	const OFFSET = 20;
 	const TIME = 60;
 
-	const handlePress = () => {
-		handleNudge();
+	function playAnimation() {
+		offset.value = withSequence(
+			withTiming(-OFFSET, { duration: TIME / 2 }),
+			// shake between -OFFSET and OFFSET 5 times
+			withRepeat(withTiming(OFFSET, { duration: TIME }), 5, true),
+			// go back to 0 at the end
+			withTiming(0, { duration: TIME / 2 })
+		);
+	}
+
+	const Message = ({ item }: any) => {
+		return item.sender_id === userProfile.id ? (
+			<Animated.View style={[styles.sender, animationStyle]}>
+				<Text
+					style={{
+						color: "#ffffff",
+					}}
+				>
+					{item.message}
+				</Text>
+			</Animated.View>
+		) : (
+			<Animated.View style={[styles.receiver, animationStyle]}>
+				<Text
+					style={{
+						color: "#7b99cd",
+					}}
+				>
+					{item.message}
+				</Text>
+			</Animated.View>
+		);
 	};
 
 	return (
@@ -168,29 +189,7 @@ export default function MessageScreen() {
 						onContentSizeChange={scrollToBottom}
 						data={messages}
 						keyExtractor={(item) => item.id}
-						renderItem={({ item }) => {
-							return item.sender_id === userProfile.id ? (
-								<Animated.View style={[styles.sender, style]}>
-									<Text
-										style={{
-											color: "#ffffff",
-										}}
-									>
-										{item.message}
-									</Text>
-								</Animated.View>
-							) : (
-								<Animated.View style={[styles.receiver, style]}>
-									<Text
-										style={{
-											color: "#7b99cd",
-										}}
-									>
-										{item.message}
-									</Text>
-								</Animated.View>
-							);
-						}}
+						renderItem={Message}
 					/>
 				</View>
 			)}
@@ -205,6 +204,21 @@ export default function MessageScreen() {
 					backgroundColor: "white",
 				}}
 			>
+				<View
+					style={{
+						maxWidth: "auto",
+						flexShrink: 1,
+						flexGrow: 0,
+						alignSelf: "center",
+
+						marginLeft: 10,
+					}}
+				>
+					<Pressable onPress={playAnimation} hitSlop={10}>
+						<AntDesign name="shake" size={20} color="black" />
+					</Pressable>
+				</View>
+
 				<CustomInput
 					control={control}
 					name={"message"}
@@ -226,7 +240,7 @@ export default function MessageScreen() {
 						backgroundColor: "white",
 						flexShrink: 1,
 						flexGrow: 0,
-						marginTop: 5,
+						alignSelf: "center",
 						marginRight: 20,
 					}}
 				>
@@ -239,7 +253,6 @@ export default function MessageScreen() {
 					</Pressable>
 				</View>
 			</View>
-			{/* <Button title="nudge" onPress={handlePress} /> */}
 		</SafeAreaView>
 	);
 }
