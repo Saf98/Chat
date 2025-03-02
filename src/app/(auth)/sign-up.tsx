@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import {
+	View,
+	Text,
+	StyleSheet,
+	Alert,
+	TouchableOpacity,
+	Platform,
+} from "react-native";
 import React, { useState } from "react";
 import Colors from "@constants/Colors";
 import { Link } from "expo-router";
@@ -6,6 +13,36 @@ import { supabase } from "src/lib/supabase";
 import { useForm } from "react-hook-form";
 import CustomInput from "@/components/CustomInput";
 import { EMAIL_REGEX } from "@/constants/Utils";
+
+const inputStyles = StyleSheet.create({
+	inputContainer: {
+		flexGrow: 0,
+		flexShrink: 1,
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#f6f8fc",
+		marginBottom: 10,
+		borderWidth: 1,
+		borderRadius: 15,
+		borderColor: "#f6f8fc",
+		maxWidth: "auto",
+		padding: Platform.OS === "ios" ? 20 : 6,
+	},
+	input: {
+		flex: 1,
+		backgroundColor: "#f6f8fc",
+		color: "#424242",
+		fontSize: 18,
+		marginLeft: Platform.OS === "ios" ? 5 : null,
+	},
+	borderTrue: {
+		borderColor: "rgb(17 71 164)",
+	},
+	borderFalse: {
+		borderColor: "red",
+	},
+});
 
 const SignUpScreen = () => {
 	const [loading, setLoading] = useState(false);
@@ -35,6 +72,7 @@ const SignUpScreen = () => {
 				name={"email"}
 				placeholder={"email@user.com"}
 				secureTextEntry={false}
+				styles={inputStyles}
 				rules={{
 					required: "Email is required",
 					pattern: { value: EMAIL_REGEX, message: "Email is invalid" },
@@ -50,6 +88,7 @@ const SignUpScreen = () => {
 				name={"password"}
 				placeholder={"password"}
 				secureTextEntry={true}
+				styles={inputStyles}
 				rules={{
 					required: "Password is required",
 					minLength: { value: 6, message: "Minimum of 6 characters required" },
@@ -60,6 +99,7 @@ const SignUpScreen = () => {
 				name={"password-repeat"}
 				placeholder={"Repeat password"}
 				secureTextEntry={true}
+				styles={inputStyles}
 				rules={{
 					required: "Password is required",
 					validate: (value): true | "Password does not match" =>
